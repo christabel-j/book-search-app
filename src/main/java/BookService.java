@@ -69,8 +69,14 @@ public class BookService {
 
             // extract first book title
             JsonNode docs = root.get("docs");
-            String firstBookTitle = docs.get(0).path("title").asText();
-            System.out.println("Book 1 - Title: " + firstBookTitle);
+
+            // check if docs is empty, ie no results found
+            if (docs.isEmpty() ) {
+                System.out.println("No results found");
+            } else {
+                String firstBookTitle = docs.get(0).path("title").asText();
+                System.out.println("Book 1 - Title: " + firstBookTitle);
+            }
 
         } catch (Exception e) {
             System.out.println("Something went wrong");
