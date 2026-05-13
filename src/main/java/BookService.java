@@ -16,6 +16,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 // for jackson ObjectMapper
 import com.fasterxml.jackson.databind.JsonNode;
@@ -48,13 +50,17 @@ public class BookService {
 
             return response.body();
         } catch (Exception e){
-            return "Something went wrong.";
+            return "Something went wrong. Couldn't call API";
         }
 
     }
 
     // method to turn the json string response into book objects
+    // will eventually return the List<BookDTO>
     public void parseBooks(String jsonString) {
+        // list to store bookDTO objects
+        List<BookDTO> books = new ArrayList<BookDTO>();
+
         try {
             // 1 - create new object mapper
             ObjectMapper mapper = new ObjectMapper();
@@ -67,19 +73,41 @@ public class BookService {
             int numFound = root.get("numFound").asInt();
             System.out.println("Results found: " + numFound);
 
-            // extract first book title
             JsonNode docs = root.get("docs");
 
             // check if docs is empty, ie no results found
             if (docs.isEmpty() ) {
                 System.out.println("No results found");
             } else {
-                String firstBookTitle = docs.get(0).path("title").asText();
-                System.out.println("Book 1 - Title: " + firstBookTitle);
+                // number of results to show & book dtos to create (3 or less)
+                int numberToShow;
+                numberToShow = (docs.size() < 3) ? docs.size() : 3;
+
+                // list of book objects -> book dtos (first 3)
+                for(int i = 0; i < numberToShow; i++) {
+                    String title = docs.get(i).path("title").asText();
+                    String author = docs.get(i).path("author_name").get(0).asText();
+                    String year = docs.get(i).path("first_publish_year").asText();
+
+                    BookDTO book = new BookDTO(title, author, year);
+                    books.add(book);
+
+                    // remove and use the getters from dto later to print nicely for user (maybe make a display results method which loops through the list of books and uses the getters to display the results)
+                    // print title
+                    System.out.println("Book " + (i+1) + " title - " + title);
+
+                    // print author
+                    System.out.println("Author: " + author);
+
+                    // print year
+                    System.out.println("First publish year: " + year);
+
+                    System.out.println("-----------------------");
+                }
             }
 
         } catch (Exception e) {
-            System.out.println("Something went wrong");
+            System.out.println("Something went wrong. Couldn't read response.");
         }
 
 

@@ -37,6 +37,8 @@ public class Main {
                     String jsonResponse = bookService.callAPI(bookService.buildURL(bookQuery));
                     bookService.parseBooks(jsonResponse);
 
+                    // display results
+
                 } else if (menuInput.equalsIgnoreCase("B")) {
                     System.out.println("Bye, happy reading :)");
                     appRunning = false;
