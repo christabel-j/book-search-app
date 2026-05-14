@@ -57,7 +57,7 @@ public class BookService {
 
     // method to turn the json string response into book objects
     // will eventually return the List<BookDTO>
-    public void parseBooks(String jsonString) {
+    public List<BookDTO> parseBooks(String jsonString) {
         // list to store bookDTO objects
         List<BookDTO> books = new ArrayList<BookDTO>();
 
@@ -65,13 +65,12 @@ public class BookService {
             // 1 - create new object mapper
             ObjectMapper mapper = new ObjectMapper();
 
-
             // 2 - Feed JSON string into Jackson (parse to a JsonNode tree)
             JsonNode root = mapper.readTree(jsonString);
 
             // Tiny proof it worked: number of books found
-            int numFound = root.get("numFound").asInt();
-            System.out.println("Results found: " + numFound);
+            // int numFound = root.get("numFound").asInt();
+            //System.out.println("Results found: " + numFound);
 
             JsonNode docs = root.get("docs");
 
@@ -94,23 +93,42 @@ public class BookService {
 
                     // remove and use the getters from dto later to print nicely for user (maybe make a display results method which loops through the list of books and uses the getters to display the results)
                     // print title
-                    System.out.println("Book " + (i+1) + " title - " + title);
-
-                    // print author
-                    System.out.println("Author: " + author);
-
-                    // print year
-                    System.out.println("First publish year: " + year);
-
-                    System.out.println("-----------------------");
+//                    System.out.println("Book " + (i+1) + " title - " + title);
+//
+//                    // print author
+//                    System.out.println("Author: " + author);
+//
+//                    // print year
+//                    System.out.println("First publish year: " + year);
+//
+//                    System.out.println("-----------------------");
                 }
-            }
 
+            }
+            return books;
         } catch (Exception e) {
             System.out.println("Something went wrong. Couldn't read response.");
+            return books;
         }
 
 
     }
 
+    // formats the first 3 book results
+    public String displayBooks(List<BookDTO> books) {
+
+        int index = 1;
+
+        String top3Books = "";
+
+        // for each book in list book dto, display each
+        for( BookDTO book:books) {
+            String title = book.getTitle();
+            String author = book.getAuthor();
+            String year = book.getYear();
+
+            top3Books += "Book " + (index++) + " - " + title + "\n" + "Author: " + author + "\n" + "First published year: " + year + "\n--------\n";
+        }
+        return top3Books;
+    }
 }
